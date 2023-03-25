@@ -1,8 +1,7 @@
-using System.Diagnostics;
 using System.Text;
 using FalseNet.Exceptions;
 
-namespace FalseNet.Parser;
+namespace FalseNet.Analyzers;
 
 public static class Lexer
 {

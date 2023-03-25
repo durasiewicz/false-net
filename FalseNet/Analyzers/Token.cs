@@ -1,4 +1,4 @@
-namespace FalseNet.Parser;
+namespace FalseNet.Analyzers;
 
 public record Token(int Position,
     int Line,

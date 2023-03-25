@@ -1,5 +1,5 @@
+using FalseNet.Analyzers;
 using FalseNet.Exceptions;
-using FalseNet.Parser;
 
 namespace FalseNet.Runtime;
 
@@ -18,11 +18,27 @@ public static class Parser
                     break;
                 
                 case TokenType.Addition:
-                    var num1 = evaluationStack.PopNumber();
+                case TokenType.Substraction:
+                case TokenType.Multiplication:
+                case TokenType.Division:
+                {
                     var num2 = evaluationStack.PopNumber();
-                    evaluationStack.PushNumber(num1.Value + num2.Value);
+                    var num1 = evaluationStack.PopNumber();
+
+                    var result = token.Type switch
+                    {
+                        TokenType.Addition => num1.Value + num2.Value,
+                        TokenType.Substraction => num1.Value - num2.Value,
+                        TokenType.Multiplication => num1.Value * num2.Value,
+                        TokenType.Division => num1.Value / num2.Value,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                    
+                    evaluationStack.PushNumber(result);
+                    
                     break;
-                
+                }
+
                 default:
                     throw new RuntimeException($"Unsupported token type '{token.Type}'");
             }
