@@ -3,4 +3,4 @@ namespace FalseNet.Parser;
 public record Token(int Position,
     int Line,
     TokenType Type,
-    object? Value = null);
+    string? Value = null);

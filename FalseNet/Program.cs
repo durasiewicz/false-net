@@ -1,12 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using FalseNet.Parser;
+using FalseNet.Runtime;
 
 var tokens = Lexer.Lex(@"""
 
 { Simple addition test }
 
-1 2 +
+11111 11111 +
 
         """);
 

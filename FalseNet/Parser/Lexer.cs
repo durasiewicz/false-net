@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Text;
 using FalseNet.Exceptions;
 
 namespace FalseNet.Parser;
@@ -14,6 +16,7 @@ public static class Lexer
         var commentStack = new Stack<Token>();
         var currentLine = 0;
         var currentPosition = 0;
+        var charBuffer = new StringBuilder();
 
         for (var index = 0; index < input.Length; index++)
         {
@@ -153,10 +156,20 @@ public static class Lexer
                 {
                     if (char.IsDigit(input[index]))
                     {
+                        charBuffer.Append(input[index]);
+                        
+                        // Continue to collect entire number to buffer, then flush buffer to token
+                        if (index + 1 < input.Length && char.IsDigit(input[index + 1]))
+                        {
+                            continue;
+                        }
+                        
                         yield return new Token(currentPosition,
                             currentLine,
                             TokenType.Number,
-                            input[index]);
+                            charBuffer.ToString());
+
+                        charBuffer.Clear();
                     }
                     
                     break;

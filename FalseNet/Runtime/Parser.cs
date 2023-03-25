@@ -1,7 +1,7 @@
 using FalseNet.Exceptions;
-using FalseNet.Runtime;
+using FalseNet.Parser;
 
-namespace FalseNet.Parser;
+namespace FalseNet.Runtime;
 
 public static class Parser
 {
@@ -14,7 +14,7 @@ public static class Parser
             switch (token.Type)
             {
                 case TokenType.Number:
-                    evaluationStack.PushNumber(int.Parse(((char)token.Value).ToString()));
+                    evaluationStack.PushNumber(int.Parse(token.Value));
                     break;
                 
                 case TokenType.Addition:
