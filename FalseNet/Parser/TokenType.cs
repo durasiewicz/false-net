@@ -9,7 +9,7 @@ public enum TokenType
     Variable,
     Character,
     Number,
-    ValueAssigment,
+    ValueSet,
     ValueFetch,
     Addition,
     Substraction,
@@ -26,5 +26,8 @@ public enum TokenType
     Swap,
     Rotate,
     Pick,
-    Condition
+    Condition,
+    Print,
+    FunctionCall,
+    Negation
 }

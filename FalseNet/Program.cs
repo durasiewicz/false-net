@@ -2,11 +2,14 @@
 
 using FalseNet.Parser;
 
-Lexer.Lex(@"""
+var tokens = Lexer.Lex(@"""
 
-{ This is comment with { nested comment } supported }
+{ Simple addition test }
 
-{
+1 2 +
+
         """);
+
+Parser.Parse(tokens);
 
 Console.WriteLine("Hello, World!");

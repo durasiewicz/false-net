@@ -1,5 +1,6 @@
 namespace FalseNet.Parser;
 
-public record Token(int posX,
-    int posY,
-    TokenType Type);
+public record Token(int Position,
+    int Line,
+    TokenType Type,
+    object? Value = null);
