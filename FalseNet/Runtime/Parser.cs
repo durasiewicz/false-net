@@ -38,6 +38,10 @@ public static class Parser
                     
                     break;
                 }
+                
+                case TokenType.Literal:
+                    Console.WriteLine(token.Value);
+                    break;
 
                 default:
                     throw new RuntimeException($"Unsupported token type '{token.Type}'");

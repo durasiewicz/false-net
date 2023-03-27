@@ -29,5 +29,6 @@ public enum TokenType
     Condition,
     Print,
     FunctionCall,
-    Negation
+    Negation,
+    Literal
 }
