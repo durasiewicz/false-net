@@ -8,6 +8,7 @@ public static class Parser
     public static void Parse(IEnumerable<Token> tokens)
     {
         var evaluationStack = new EvaluationStack();
+        var variables = new Dictionary<string, int>();
 
         foreach (var token in tokens)
         {
@@ -38,11 +39,39 @@ public static class Parser
                     
                     break;
                 }
-                
+
+                case TokenType.ValueSet:
+                {
+                    var reference = evaluationStack.PopReference();
+                    var value = evaluationStack.PopNumber();
+
+                    if (!variables.ContainsKey(reference.Key))
+                        variables.Add(reference.Key, 0);
+
+                    variables[reference.Key] = value.Value;
+                    break;
+                }
+
+                case TokenType.ValueFetch:
+                {
+                    var reference = evaluationStack.PopReference();
+
+                    if (!variables.ContainsKey(reference.Key))
+                        variables.Add(reference.Key, 0);
+                    
+                    evaluationStack.PushNumber(variables[reference.Key]);
+                    
+                    break;
+                }
+
                 case TokenType.Literal:
                     Console.WriteLine(token.Value);
                     break;
 
+                case TokenType.Variable:
+                    evaluationStack.PushReference(token.Value);
+                    break;
+                
                 default:
                     throw new RuntimeException($"Unsupported token type '{token.Type}'");
             }

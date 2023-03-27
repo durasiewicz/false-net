@@ -2,5 +2,6 @@ namespace FalseNet.Runtime;
 
 public enum StackValueType
 {
-    Number
+    Number,
+    Reference
 }

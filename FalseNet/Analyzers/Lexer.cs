@@ -54,13 +54,13 @@ public static class Lexer
                     break;
                 }
 
-                case ':':
+                case ';':
                     yield return new Token(currentPosition,
                         currentLine,
                         TokenType.ValueFetch);
                     break;
                 
-                case ';':
+                case ':':
                     yield return new Token(currentPosition,
                         currentLine,
                         TokenType.ValueSet);
@@ -190,31 +190,66 @@ public static class Lexer
                             break;
                     }
 
-                    if (char.IsDigit(input[index]) || char.IsLetter(input[index]))
+                    if (mode == Mode.Number)
                     {
                         charBuffer.Append(input[index]);
                         
-                        // Continue to collect entire number to buffer, then flush buffer to token
-                        if (index + 1 < input.Length && 
-                            (char.IsDigit(input[index + 1]) ||
-                            char.IsLetter(input[index + 1])))
+                        if (index + 1 < input.Length || !char.IsNumber(input[index + 1]))
                         {
-                            continue;
+                            yield return new Token(currentPosition,
+                                currentLine,
+                                TokenType.Number,
+                                charBuffer.ToString());
+                            
+                            charBuffer.Clear();
+                            mode = Mode.Default;
                         }
-                        
-                        yield return new Token(currentPosition,
-                            currentLine,
-                            mode switch
-                            {
-                                Mode.Number => TokenType.Number,
-                                Mode.Variable => TokenType.Variable,
-                                _ => throw new InvalidOperationException()
-                            },
-                            charBuffer.ToString());
-
-                        charBuffer.Clear();
-                        mode = Mode.Default;
                     }
+                    
+                    if (mode == Mode.Variable)
+                    {
+                        charBuffer.Append(input[index]);
+                        
+                        if (index + 1 < input.Length || !char.IsLetter(input[index + 1]))
+                        {
+                            yield return new Token(currentPosition,
+                                currentLine,
+                                TokenType.Variable,
+                                charBuffer.ToString());
+                            
+                            charBuffer.Clear();
+                            mode = Mode.Default;
+                        }
+                    }
+                    
+                    
+                    // if (char.IsDigit(input[index]) && mode == Mode.Variable)
+                    //
+                    //     || char.IsLetter(input[index]))
+                    // {
+                    //     charBuffer.Append(input[index]);
+                    //     
+                    //     // Continue to collect entire number to buffer, then flush buffer to token
+                    //     if (index + 1 < input.Length && 
+                    //         (char.IsDigit(input[index + 1]) ||
+                    //         char.IsLetter(input[index + 1])))
+                    //     {
+                    //         continue;
+                    //     }
+                    //     
+                    //     yield return new Token(currentPosition,
+                    //         currentLine,
+                    //         mode switch
+                    //         {
+                    //             Mode.Number => TokenType.Number,
+                    //             Mode.Variable => TokenType.Variable,
+                    //             _ => throw new InvalidOperationException()
+                    //         },
+                    //         charBuffer.ToString());
+                    //
+                    //     charBuffer.Clear();
+                    //     mode = Mode.Default;
+                    // }
                     
                     break;
                 }

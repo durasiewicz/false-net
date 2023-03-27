@@ -26,4 +26,25 @@ public class EvaluationStack
 
         return (NumberValue)value;
     }
+
+    public void PushReference(string key)
+    {
+        _stack.Push(new ReferenceValue(key));
+    }
+    
+    public ReferenceValue PopReference()
+    {
+        if (!_stack.TryPop(out var value))
+        {
+            throw new RuntimeException("Runtime stack is empty.");
+        }
+
+        if (value.Type is not StackValueType.Reference)
+        {
+            throw new RuntimeException(
+                $"Expected '{nameof(StackValueType.Reference)}' on stack. Got '{value.Type.ToString()}'.");
+        }
+
+        return (ReferenceValue)value;
+    }
 }
