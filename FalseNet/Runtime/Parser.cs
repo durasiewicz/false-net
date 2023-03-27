@@ -17,6 +17,38 @@ public static class Parser
                 case TokenType.Number:
                     evaluationStack.PushNumber(int.Parse(token.Value));
                     break;
+
+                case TokenType.PrintCharacter:
+                {
+                    var num = evaluationStack.PopNumber();
+                    Console.Write((char)num.Value);
+                    break;
+                }
+                
+                case TokenType.PrintNumber:
+                {
+                    var num = evaluationStack.PopNumber();
+                    Console.Write(num.Value);
+                    break;
+                }
+                
+                case TokenType.Duplicate:
+                {
+                    var num = evaluationStack.PopNumber();
+                    evaluationStack.PushNumber(num.Value);
+                    evaluationStack.PushNumber(num.Value);
+                    break;
+                }
+                
+                case TokenType.Swap:
+                {
+                    var num2 = evaluationStack.PopNumber();
+                    var num1 = evaluationStack.PopNumber();
+                    evaluationStack.PushNumber(num2.Value);
+                    evaluationStack.PushNumber(num1.Value);
+                    
+                    break;
+                }
                 
                 case TokenType.Addition:
                 case TokenType.Substraction:
@@ -65,7 +97,7 @@ public static class Parser
                 }
 
                 case TokenType.Literal:
-                    Console.WriteLine(token.Value);
+                    Console.Write(token.Value);
                     break;
 
                 case TokenType.Variable:

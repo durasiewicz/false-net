@@ -7,14 +7,13 @@ var p = @"
 
 { Simple addition test }
 
-"" ala ma kota ""
-
-
 2 3 * 1 + 2 * 5 - 3 / q:
 
 2 2 * z:
 
 q;z;+
+
+""The result is: "" .
 
         ";
 

@@ -32,7 +32,13 @@ public static class Lexer
             {
                 continue;
             }
-            
+
+            if (mode == Mode.Literal && input[index] is not '"')
+            {
+                charBuffer.Append(input[index]);
+                continue;
+            }
+
             switch (input[index])
             {
                 case '{':
@@ -150,6 +156,18 @@ public static class Lexer
                         TokenType.Rotate);
                     break;
                 
+                case '.':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.PrintNumber);
+                    break;
+                
+                case ',':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.PrintCharacter);
+                    break;
+                
                 case '"':
                     switch (mode)
                     {
@@ -177,10 +195,6 @@ public static class Lexer
                 {
                     switch (mode)
                     {
-                        case Mode.Literal:
-                            charBuffer.Append(input[index]);
-                            continue;
-                        
                         case Mode.Default:
                             if (char.IsDigit(input[index]))
                                 mode = Mode.Number;
@@ -221,36 +235,7 @@ public static class Lexer
                             mode = Mode.Default;
                         }
                     }
-                    
-                    
-                    // if (char.IsDigit(input[index]) && mode == Mode.Variable)
-                    //
-                    //     || char.IsLetter(input[index]))
-                    // {
-                    //     charBuffer.Append(input[index]);
-                    //     
-                    //     // Continue to collect entire number to buffer, then flush buffer to token
-                    //     if (index + 1 < input.Length && 
-                    //         (char.IsDigit(input[index + 1]) ||
-                    //         char.IsLetter(input[index + 1])))
-                    //     {
-                    //         continue;
-                    //     }
-                    //     
-                    //     yield return new Token(currentPosition,
-                    //         currentLine,
-                    //         mode switch
-                    //         {
-                    //             Mode.Number => TokenType.Number,
-                    //             Mode.Variable => TokenType.Variable,
-                    //             _ => throw new InvalidOperationException()
-                    //         },
-                    //         charBuffer.ToString());
-                    //
-                    //     charBuffer.Clear();
-                    //     mode = Mode.Default;
-                    // }
-                    
+
                     break;
                 }
             }

@@ -30,5 +30,7 @@ public enum TokenType
     Print,
     FunctionCall,
     Negation,
-    Literal
+    Literal,
+    PrintNumber,
+    PrintCharacter
 }
