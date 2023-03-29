@@ -6,9 +6,9 @@ public class EvaluationStack
 {
     private readonly Stack<StackValue> _stack = new Stack<StackValue>();
     
-    public void PushNumber(int value)
+    public void PushNumber(int value, bool isFunctionHandle = false)
     {
-        _stack.Push(new NumberValue(value));
+        _stack.Push(new NumberValue(value, isFunctionHandle));
     }
 
     public NumberValue PopNumber()

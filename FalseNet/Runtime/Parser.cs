@@ -5,15 +5,15 @@ namespace FalseNet.Runtime;
 
 public class Parser
 {
-    private static int _functionCounter;
-    private static EvaluationStack _evaluationStack = new EvaluationStack();
-    private static Dictionary<string, int> _variables = new Dictionary<string, int>();
-    private static Dictionary<int, List<Token>> _functions = new Dictionary<int, List<Token>>();
-    private static Stack<int> _functionStack = new Stack<int>();
+    private int _functionCounter;
+    private readonly EvaluationStack _evaluationStack = new();
+    private readonly Dictionary<string, Variable> _variables = new();
+    private readonly Dictionary<int, List<Token>> _functions = new();
+    private readonly Stack<int> _functionStack = new();
 
     private const int TrueValue = -1;
     private const int FalseValue = 0;
-    
+
     public void Parse(IEnumerable<Token> tokens)
     {
         foreach (var token in tokens)
@@ -77,7 +77,7 @@ public class Parser
                     _evaluationStack.PushNumber(-num.Value);
                     break;
                 }
-                
+
                 case TokenType.Condition:
                 {
                     var functionId = _evaluationStack.PopNumber();
@@ -87,7 +87,7 @@ public class Parser
                     {
                         CallFunction(functionId);
                     }
-                    
+
                     break;
                 }
 
@@ -117,22 +117,19 @@ public class Parser
                 {
                     var reference = _evaluationStack.PopReference();
                     var value = _evaluationStack.PopNumber();
+                    var variable = new Variable(value.Value, value.IsFunctionHandle);
 
-                    if (!_variables.ContainsKey(reference.Key))
-                        _variables.Add(reference.Key, 0);
+                    _variables[reference.Key] = variable;
 
-                    _variables[reference.Key] = value.Value;
                     break;
                 }
 
                 case TokenType.ValueFetch:
                 {
                     var reference = _evaluationStack.PopReference();
-
-                    if (!_variables.ContainsKey(reference.Key))
-                        _variables.Add(reference.Key, 0);
-
-                    _evaluationStack.PushNumber(_variables[reference.Key]);
+                    _variables.TryAdd(reference.Key, new Variable(0, false));
+                    _evaluationStack.PushNumber(_variables[reference.Key].Value, 
+                        _variables[reference.Key].IsFunctionHandle);
 
                     break;
                 }
@@ -148,7 +145,7 @@ public class Parser
                 case TokenType.FunctionEnd:
                 {
                     var functionId = _functionStack.Pop();
-                    _evaluationStack.PushNumber(functionId);
+                    _evaluationStack.PushNumber(functionId, true);
                     break;
                 }
 
@@ -168,6 +165,11 @@ public class Parser
 
     private void CallFunction(NumberValue functionId)
     {
+        if (!functionId.IsFunctionHandle)
+        {
+            throw new RuntimeException("Value is not a function handle.");
+        }
+        
         if (!_functions.TryGetValue(functionId.Value, out var function))
         {
             throw new RuntimeException("Function is undefined.");
