@@ -3,60 +3,85 @@ using FalseNet.Exceptions;
 
 namespace FalseNet.Runtime;
 
-public static class Parser
+public class Parser
 {
-    public static void Parse(IEnumerable<Token> tokens)
+    private static int _functionCounter;
+    private static EvaluationStack _evaluationStack = new EvaluationStack();
+    private static Dictionary<string, int> _variables = new Dictionary<string, int>();
+    private static Dictionary<int, List<Token>> _functions = new Dictionary<int, List<Token>>();
+    private static Stack<int> _functionStack = new Stack<int>();
+    
+    public void Parse(IEnumerable<Token> tokens)
     {
-        var evaluationStack = new EvaluationStack();
-        var variables = new Dictionary<string, int>();
-
         foreach (var token in tokens)
         {
+            if (_functionStack.Count > 0 &&
+                token.Type is not TokenType.FunctionBegin
+                    and not TokenType.FunctionEnd)
+            {
+                _functions[_functionStack.Peek()].Add(token);
+                continue;
+            }
+
             switch (token.Type)
             {
                 case TokenType.Number:
-                    evaluationStack.PushNumber(int.Parse(token.Value));
+                    _evaluationStack.PushNumber(int.Parse(token.Value));
                     break;
 
-                case TokenType.PrintCharacter:
+                case TokenType.FunctionCall:
                 {
-                    var num = evaluationStack.PopNumber();
-                    Console.Write((char)num.Value);
-                    break;
-                }
-                
-                case TokenType.PrintNumber:
-                {
-                    var num = evaluationStack.PopNumber();
-                    Console.Write(num.Value);
-                    break;
-                }
-                
-                case TokenType.Duplicate:
-                {
-                    var num = evaluationStack.PopNumber();
-                    evaluationStack.PushNumber(num.Value);
-                    evaluationStack.PushNumber(num.Value);
-                    break;
-                }
-                
-                case TokenType.Swap:
-                {
-                    var num2 = evaluationStack.PopNumber();
-                    var num1 = evaluationStack.PopNumber();
-                    evaluationStack.PushNumber(num2.Value);
-                    evaluationStack.PushNumber(num1.Value);
+                    var functionId = _evaluationStack.PopNumber();
+
+                    if (!_functions.TryGetValue(functionId.Value, out var function))
+                    {
+                        throw new RuntimeException("Function is undefined.");
+                    }
+                    
+                    Parse(function);
                     
                     break;
                 }
-                
+
+                case TokenType.PrintCharacter:
+                {
+                    var num = _evaluationStack.PopNumber();
+                    Console.Write((char)num.Value);
+                    break;
+                }
+
+                case TokenType.PrintNumber:
+                {
+                    var num = _evaluationStack.PopNumber();
+                    Console.Write(num.Value);
+                    break;
+                }
+
+                case TokenType.Duplicate:
+                {
+                    var num = _evaluationStack.PopNumber();
+                    _evaluationStack.PushNumber(num.Value);
+                    _evaluationStack.PushNumber(num.Value);
+                    break;
+                }
+
+                case TokenType.Swap:
+                {
+                    var num2 = _evaluationStack.PopNumber();
+                    var num1 = _evaluationStack.PopNumber();
+                    _evaluationStack.PushNumber(num2.Value);
+                    _evaluationStack.PushNumber(num1.Value);
+
+                    break;
+                }
+
                 case TokenType.Addition:
                 case TokenType.Substraction:
                 case TokenType.Multiplication:
                 case TokenType.Division:
                 {
-                    var num2 = evaluationStack.PopNumber();
-                    var num1 = evaluationStack.PopNumber();
+                    var num2 = _evaluationStack.PopNumber();
+                    var num1 = _evaluationStack.PopNumber();
 
                     var result = token.Type switch
                     {
@@ -66,33 +91,48 @@ public static class Parser
                         TokenType.Division => num1.Value / num2.Value,
                         _ => throw new ArgumentOutOfRangeException()
                     };
-                    
-                    evaluationStack.PushNumber(result);
-                    
+
+                    _evaluationStack.PushNumber(result);
+
                     break;
                 }
 
                 case TokenType.ValueSet:
                 {
-                    var reference = evaluationStack.PopReference();
-                    var value = evaluationStack.PopNumber();
+                    var reference = _evaluationStack.PopReference();
+                    var value = _evaluationStack.PopNumber();
 
-                    if (!variables.ContainsKey(reference.Key))
-                        variables.Add(reference.Key, 0);
+                    if (!_variables.ContainsKey(reference.Key))
+                        _variables.Add(reference.Key, 0);
 
-                    variables[reference.Key] = value.Value;
+                    _variables[reference.Key] = value.Value;
                     break;
                 }
 
                 case TokenType.ValueFetch:
                 {
-                    var reference = evaluationStack.PopReference();
+                    var reference = _evaluationStack.PopReference();
 
-                    if (!variables.ContainsKey(reference.Key))
-                        variables.Add(reference.Key, 0);
-                    
-                    evaluationStack.PushNumber(variables[reference.Key]);
-                    
+                    if (!_variables.ContainsKey(reference.Key))
+                        _variables.Add(reference.Key, 0);
+
+                    _evaluationStack.PushNumber(_variables[reference.Key]);
+
+                    break;
+                }
+
+                case TokenType.FunctionBegin:
+                {
+                    var functionId = _functionCounter++;
+                    _functionStack.Push(functionId);
+                    _functions.Add(functionId, new List<Token>());
+                    break;
+                }
+
+                case TokenType.FunctionEnd:
+                {
+                    var functionId = _functionStack.Pop();
+                    _evaluationStack.PushNumber(functionId);
                     break;
                 }
 
@@ -101,9 +141,9 @@ public static class Parser
                     break;
 
                 case TokenType.Variable:
-                    evaluationStack.PushReference(token.Value);
+                    _evaluationStack.PushReference(token.Value);
                     break;
-                
+
                 default:
                     throw new RuntimeException($"Unsupported token type '{token.Type}'");
             }

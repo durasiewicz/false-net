@@ -5,7 +5,7 @@ using FalseNet.Runtime;
 
 var p = @"
 
-{ Simple addition test }
+{ Simple addition test 
 
 2 3 * 1 + 2 * 5 - 3 / q:
 
@@ -13,12 +13,18 @@ var p = @"
 
 q;z;+
 
-""The result is: "" .
+}
+
+[1+]f:
+
+1f;!f;!f;!
+
+""The result is: "" . 
 
         ";
 
 var tokens = Lexer.Lex(p);
-
-Parser.Parse(tokens);
+var parser = new Parser();
+parser.Parse(tokens);
 
 Console.WriteLine("Hello, World!");

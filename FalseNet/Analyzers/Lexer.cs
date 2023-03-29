@@ -168,6 +168,18 @@ public static class Lexer
                         TokenType.PrintCharacter);
                     break;
                 
+                case '[':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.FunctionBegin);
+                    break;
+                
+                case ']':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.FunctionEnd);
+                    break;
+                
                 case '"':
                     switch (mode)
                     {
