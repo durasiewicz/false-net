@@ -32,5 +32,6 @@ public enum TokenType
     Negation,
     Literal,
     PrintNumber,
-    PrintCharacter
+    PrintCharacter,
+    MinusSign
 }

@@ -13,13 +13,16 @@ var p = @"
 
 q;z;+
 
-}
+
 
 [1+]f:
 
 1f;!f;!f;!
 
 ""The result is: "" . 
+}
+
+1_[""Value is true""]?
 
         ";
 

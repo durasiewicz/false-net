@@ -102,6 +102,12 @@ public static class Lexer
                         TokenType.FunctionCall);
                     break;
                 
+                case '?':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.Condition);
+                    break;
+                
                 case '=':
                     yield return new Token(currentPosition,
                         currentLine,
@@ -136,6 +142,12 @@ public static class Lexer
                     yield return new Token(currentPosition,
                         currentLine,
                         TokenType.Duplicate);
+                    break;
+                
+                case '_':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.MinusSign);
                     break;
                 
                 case '%':

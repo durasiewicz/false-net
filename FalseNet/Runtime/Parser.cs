@@ -10,6 +10,9 @@ public class Parser
     private static Dictionary<string, int> _variables = new Dictionary<string, int>();
     private static Dictionary<int, List<Token>> _functions = new Dictionary<int, List<Token>>();
     private static Stack<int> _functionStack = new Stack<int>();
+
+    private const int TrueValue = -1;
+    private const int FalseValue = 0;
     
     public void Parse(IEnumerable<Token> tokens)
     {
@@ -32,14 +35,7 @@ public class Parser
                 case TokenType.FunctionCall:
                 {
                     var functionId = _evaluationStack.PopNumber();
-
-                    if (!_functions.TryGetValue(functionId.Value, out var function))
-                    {
-                        throw new RuntimeException("Function is undefined.");
-                    }
-                    
-                    Parse(function);
-                    
+                    CallFunction(functionId);
                     break;
                 }
 
@@ -72,6 +68,26 @@ public class Parser
                     _evaluationStack.PushNumber(num2.Value);
                     _evaluationStack.PushNumber(num1.Value);
 
+                    break;
+                }
+
+                case TokenType.MinusSign:
+                {
+                    var num = _evaluationStack.PopNumber();
+                    _evaluationStack.PushNumber(-num.Value);
+                    break;
+                }
+                
+                case TokenType.Condition:
+                {
+                    var functionId = _evaluationStack.PopNumber();
+                    var condition = _evaluationStack.PopNumber();
+
+                    if (condition.Value == TrueValue)
+                    {
+                        CallFunction(functionId);
+                    }
+                    
                     break;
                 }
 
@@ -148,5 +164,15 @@ public class Parser
                     throw new RuntimeException($"Unsupported token type '{token.Type}'");
             }
         }
+    }
+
+    private void CallFunction(NumberValue functionId)
+    {
+        if (!_functions.TryGetValue(functionId.Value, out var function))
+        {
+            throw new RuntimeException("Function is undefined.");
+        }
+
+        Parse(function);
     }
 }
