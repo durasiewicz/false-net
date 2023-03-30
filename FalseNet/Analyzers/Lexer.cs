@@ -238,7 +238,7 @@ public static class Lexer
                     {
                         charBuffer.Append(input[index]);
                         
-                        if (index + 1 < input.Length || !char.IsNumber(input[index + 1]))
+                        if (index + 1 >= input.Length || !char.IsNumber(input[index + 1]))
                         {
                             yield return new Token(currentPosition,
                                 currentLine,
