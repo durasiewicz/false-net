@@ -192,6 +192,12 @@ public static class Lexer
                         TokenType.FunctionEnd);
                     break;
                 
+                case '#':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.Loop);
+                    break;
+                
                 case '"':
                     switch (mode)
                     {

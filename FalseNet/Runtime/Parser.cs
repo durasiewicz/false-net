@@ -34,8 +34,32 @@ public class Parser
 
                 case TokenType.FunctionCall:
                 {
-                    var functionId = _evaluationStack.PopNumber();
-                    CallFunction(functionId);
+                    var functionHandle = _evaluationStack.PopNumber();
+                    CallFunction(functionHandle);
+                    break;
+                }
+
+                case TokenType.Loop:
+                {
+                    var bodyFunctionHandle = _evaluationStack.PopNumber();
+                    var conditionFunctionHandle = _evaluationStack.PopNumber();
+
+                    while (true)
+                    {
+                        CallFunction(conditionFunctionHandle);
+
+                        var conditionResult = _evaluationStack.PopNumber();
+
+                        if (conditionResult.Value == TrueValue)
+                        {
+                            CallFunction(bodyFunctionHandle);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+
                     break;
                 }
 
@@ -61,6 +85,22 @@ public class Parser
                     break;
                 }
 
+                case TokenType.GreaterThan:
+                {
+                    var num2 = _evaluationStack.PopNumber();
+                    var num1 = _evaluationStack.PopNumber();
+                    _evaluationStack.PushNumber(num1.Value > num2.Value ? TrueValue : FalseValue);
+                    break;
+                }
+
+                case TokenType.Negation:
+                {
+                    var num = _evaluationStack.PopNumber();
+                    _evaluationStack.PushNumber(num.Value == FalseValue ? TrueValue : FalseValue);
+                    
+                    break;
+                }
+                
                 case TokenType.Swap:
                 {
                     var num2 = _evaluationStack.PopNumber();
@@ -136,9 +176,9 @@ public class Parser
 
                 case TokenType.FunctionBegin:
                 {
-                    var functionId = _functionCounter++;
-                    _functionStack.Push(functionId);
-                    _functions.Add(functionId, new List<Token>());
+                    var functionHandle = _functionCounter++;
+                    _functionStack.Push(functionHandle);
+                    _functions.Add(functionHandle, new List<Token>());
                     break;
                 }
 

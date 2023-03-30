@@ -22,7 +22,7 @@ q;z;+
 ""The result is: "" . 
 }
 
-1_[""Value is true""]?
+1[$7>~][1+]#.
 
         ";
 

@@ -33,5 +33,6 @@ public enum TokenType
     Literal,
     PrintNumber,
     PrintCharacter,
-    MinusSign
+    MinusSign,
+    Loop
 }
