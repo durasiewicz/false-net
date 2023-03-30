@@ -63,6 +63,14 @@ public class Parser
                     break;
                 }
 
+                case TokenType.Equals:
+                {
+                    var num2 = _evaluationStack.PopNumber();
+                    var num1 = _evaluationStack.PopNumber();
+                    _evaluationStack.PushNumber(num1.Value == num2.Value ? TrueValue : FalseValue);
+                    break;
+                }
+
                 case TokenType.PrintCharacter:
                 {
                     var num = _evaluationStack.PopNumber();
