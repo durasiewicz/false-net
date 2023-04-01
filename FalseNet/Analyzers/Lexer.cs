@@ -8,9 +8,9 @@ public static class Lexer
     private enum Mode
     {
         Default,
-        Literal,
-        Number,
-        Variable
+        DoubleQuotedStringLiteral,
+        NumericLiteral,
+        StringLiteral
     }
 
     public static IEnumerable<Token> Lex(string input)
@@ -33,7 +33,7 @@ public static class Lexer
                 continue;
             }
 
-            if (mode == Mode.Literal && input[index] is not '"')
+            if (mode == Mode.DoubleQuotedStringLiteral && input[index] is not '"')
             {
                 charBuffer.Append(input[index]);
                 continue;
@@ -63,49 +63,49 @@ public static class Lexer
                 case ';':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.ValueFetch);
+                        TokenType.Semicolon);
                     break;
                 
                 case ':':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.ValueSet);
+                        TokenType.Colon);
                     break;
                 
                 case '+':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Addition);
+                        TokenType.Plus);
                     break;
                 
                 case '-':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Substraction);
+                        TokenType.Minus);
                     break;
                 
                 case '*':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Multiplication);
+                        TokenType.Asterisk);
                     break;
                 
                 case '/':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Division);
+                        TokenType.Slash);
                     break;
                 
                 case '!':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.FunctionCall);
+                        TokenType.Exclamation);
                     break;
                 
                 case '?':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Condition);
+                        TokenType.Question);
                     break;
                 
                 case '=':
@@ -123,91 +123,91 @@ public static class Lexer
                 case '~':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Negation);
+                        TokenType.Tilde);
                     break;
                 
                 case '&':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.And);
+                        TokenType.Ampersand);
                     break;
                 
                 case '|':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Or);
+                        TokenType.Bar);
                     break;
                 
                 case '$':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Duplicate);
+                        TokenType.Dollar);
                     break;
                 
                 case '_':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.MinusSign);
+                        TokenType.Underscore);
                     break;
                 
                 case '%':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Delete);
+                        TokenType.Percent);
                     break;
                 
                 case '\\':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Swap);
+                        TokenType.Backslash);
                     break;
                 
                 case '@':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Rotate);
+                        TokenType.At);
                     break;
                 
                 case '.':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.PrintNumber);
+                        TokenType.Dot);
                     break;
                 
                 case ',':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.PrintCharacter);
+                        TokenType.Comma);
                     break;
                 
                 case '[':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.FunctionBegin);
+                        TokenType.OpenBracket);
                     break;
                 
                 case ']':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.FunctionEnd);
+                        TokenType.CloseBracket);
                     break;
                 
                 case '#':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.Loop);
+                        TokenType.Hash);
                     break;
                 
                 case '"':
                     switch (mode)
                     {
                         case Mode.Default:
-                            mode = Mode.Literal;
+                            mode = Mode.DoubleQuotedStringLiteral;
                             break;
-                        case Mode.Literal:
+                        case Mode.DoubleQuotedStringLiteral:
                             yield return new Token(currentPosition,
                                 currentLine,
-                                TokenType.Literal,
+                                TokenType.DoubleQuotedStringLiteral,
                                 charBuffer.ToString());
 
                             charBuffer.Clear();
@@ -227,14 +227,14 @@ public static class Lexer
                     {
                         case Mode.Default:
                             if (char.IsDigit(input[index]))
-                                mode = Mode.Number;
+                                mode = Mode.NumericLiteral;
 
                             if (char.IsLetter(input[index]))
-                                mode = Mode.Variable;
+                                mode = Mode.StringLiteral;
                             break;
                     }
 
-                    if (mode == Mode.Number)
+                    if (mode == Mode.NumericLiteral)
                     {
                         charBuffer.Append(input[index]);
                         
@@ -242,7 +242,7 @@ public static class Lexer
                         {
                             yield return new Token(currentPosition,
                                 currentLine,
-                                TokenType.Number,
+                                TokenType.NumericLiteral,
                                 charBuffer.ToString());
                             
                             charBuffer.Clear();
@@ -250,7 +250,7 @@ public static class Lexer
                         }
                     }
                     
-                    if (mode == Mode.Variable)
+                    if (mode == Mode.StringLiteral)
                     {
                         charBuffer.Append(input[index]);
                         
@@ -258,7 +258,7 @@ public static class Lexer
                         {
                             yield return new Token(currentPosition,
                                 currentLine,
-                                TokenType.Variable,
+                                TokenType.StringLiteral,
                                 charBuffer.ToString());
                             
                             charBuffer.Clear();

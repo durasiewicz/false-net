@@ -23,18 +23,18 @@ public class Parser
             {
                 switch (token.Type)
                 {
-                    case TokenType.Number:
+                    case TokenType.NumericLiteral:
                         _evaluationStack.PushNumber(int.Parse(token.Value));
                         break;
 
-                    case TokenType.FunctionCall:
+                    case TokenType.Exclamation:
                     {
                         var functionHandle = _evaluationStack.PopNumber();
                         CallFunction(functionHandle);
                         break;
                     }
 
-                    case TokenType.Loop:
+                    case TokenType.Hash:
                     {
                         var bodyFunctionHandle = _evaluationStack.PopNumber();
                         var conditionFunctionHandle = _evaluationStack.PopNumber();
@@ -66,21 +66,21 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.PrintCharacter:
+                    case TokenType.Comma:
                     {
                         var num = _evaluationStack.PopNumber();
                         Console.Write((char)num.Value);
                         break;
                     }
 
-                    case TokenType.PrintNumber:
+                    case TokenType.Dot:
                     {
                         var num = _evaluationStack.PopNumber();
                         Console.Write(num.Value);
                         break;
                     }
 
-                    case TokenType.Duplicate:
+                    case TokenType.Dollar:
                     {
                         var num = _evaluationStack.PopNumber();
                         _evaluationStack.PushNumber(num.Value);
@@ -96,7 +96,7 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.Negation:
+                    case TokenType.Tilde:
                     {
                         var num = _evaluationStack.PopNumber();
                         _evaluationStack.PushNumber(num.Value == FalseValue ? TrueValue : FalseValue);
@@ -104,7 +104,7 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.Swap:
+                    case TokenType.Backslash:
                     {
                         var num2 = _evaluationStack.PopNumber();
                         var num1 = _evaluationStack.PopNumber();
@@ -114,14 +114,14 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.MinusSign:
+                    case TokenType.Underscore:
                     {
                         var num = _evaluationStack.PopNumber();
                         _evaluationStack.PushNumber(-num.Value);
                         break;
                     }
 
-                    case TokenType.Condition:
+                    case TokenType.Question:
                     {
                         var functionId = _evaluationStack.PopNumber();
                         var condition = _evaluationStack.PopNumber();
@@ -134,26 +134,50 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.Delete:
+                    case TokenType.Ampersand:
+                    {
+                        var num2 = _evaluationStack.PopNumber();
+                        var num1 = _evaluationStack.PopNumber();
+
+                        _evaluationStack.PushNumber(num1.Value == TrueValue && num2.Value == TrueValue
+                            ? TrueValue
+                            : FalseValue);
+
+                        break;
+                    }
+                    
+                    case TokenType.Bar:
+                    {
+                        var num2 = _evaluationStack.PopNumber();
+                        var num1 = _evaluationStack.PopNumber();
+
+                        _evaluationStack.PushNumber(num1.Value == TrueValue || num2.Value == TrueValue
+                            ? TrueValue
+                            : FalseValue);
+
+                        break;
+                    }
+
+                    case TokenType.Percent:
                     {
                         _evaluationStack.PopAny();
                         break;
                     }
 
-                    case TokenType.Addition:
-                    case TokenType.Substraction:
-                    case TokenType.Multiplication:
-                    case TokenType.Division:
+                    case TokenType.Plus:
+                    case TokenType.Minus:
+                    case TokenType.Asterisk:
+                    case TokenType.Slash:
                     {
                         var num2 = _evaluationStack.PopNumber();
                         var num1 = _evaluationStack.PopNumber();
 
                         var result = token.Type switch
                         {
-                            TokenType.Addition => num1.Value + num2.Value,
-                            TokenType.Substraction => num1.Value - num2.Value,
-                            TokenType.Multiplication => num1.Value * num2.Value,
-                            TokenType.Division => num1.Value / num2.Value,
+                            TokenType.Plus => num1.Value + num2.Value,
+                            TokenType.Minus => num1.Value - num2.Value,
+                            TokenType.Asterisk => num1.Value * num2.Value,
+                            TokenType.Slash => num1.Value / num2.Value,
                             _ => throw new ArgumentOutOfRangeException()
                         };
 
@@ -162,7 +186,7 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.ValueSet:
+                    case TokenType.Colon:
                     {
                         var reference = _evaluationStack.PopReference();
                         var value = _evaluationStack.PopNumber();
@@ -173,7 +197,7 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.ValueFetch:
+                    case TokenType.Semicolon:
                     {
                         var reference = _evaluationStack.PopReference();
                         _variables.TryAdd(reference.Key, new Variable(0, false));
@@ -183,15 +207,15 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.FunctionBegin:
-                    case TokenType.FunctionEnd:
+                    case TokenType.OpenBracket:
+                    case TokenType.CloseBracket:
                         throw new RuntimeException("Unexpected function begin or end. Functions compiler fails?");
 
-                    case TokenType.Literal:
+                    case TokenType.DoubleQuotedStringLiteral:
                         Console.Write(token.Value);
                         break;
 
-                    case TokenType.Variable:
+                    case TokenType.StringLiteral:
                         _evaluationStack.PushReference(token.Value);
                         break;
 
@@ -215,7 +239,7 @@ public class Parser
         {
             switch (token.Type)
             {
-                case TokenType.FunctionBegin:
+                case TokenType.OpenBracket:
                 {
                     var functionHandle = functionCounter++;
                     functionsHandleStack.Push(functionHandle);
@@ -223,13 +247,13 @@ public class Parser
                     break;
                 }
 
-                case TokenType.FunctionEnd:
+                case TokenType.CloseBracket:
                 {
                     var functionHandle = functionsHandleStack.Pop();
                     var variableName = AnonymousFunctionPrefix + functionHandle;
-                    var variableToken = token with { Type = TokenType.Variable, Value = variableName };
-                    var fetchValueToken = token with { Type = TokenType.ValueFetch, Value = null };
-                    
+                    var variableToken = token with { Type = TokenType.StringLiteral, Value = variableName };
+                    var fetchValueToken = token with { Type = TokenType.Semicolon, Value = null };
+
                     _variables.Add(variableName, new Variable(functionHandle, true));
 
                     if (functionsHandleStack.Any())
@@ -242,7 +266,7 @@ public class Parser
                         yield return variableToken;
                         yield return fetchValueToken;
                     }
-                    
+
                     break;
                 }
 
