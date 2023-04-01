@@ -15,3 +15,13 @@ Call recursive function 'f' until value on stack is greater than 10, then print 
 
 2f;!. 
 ```
+
+Factorial function:
+
+```
+{ Code from False language documentation }
+
+[$1=$[\%1\]?~[$1-f;!*]?]f:
+
+6f;!.
+```

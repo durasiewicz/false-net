@@ -11,12 +11,19 @@ public class EvaluationStack
         _stack.Push(new NumberValue(value, isFunctionHandle));
     }
 
-    public NumberValue PopNumber()
+    public StackValue PopAny()
     {
         if (!_stack.TryPop(out var value))
         {
             throw new RuntimeException("Runtime stack is empty.");
         }
+
+        return value;
+    }
+    
+    public NumberValue PopNumber()
+    {
+        var value = PopAny(); 
 
         if (value.Type is not StackValueType.Number)
         {
@@ -34,10 +41,7 @@ public class EvaluationStack
     
     public ReferenceValue PopReference()
     {
-        if (!_stack.TryPop(out var value))
-        {
-            throw new RuntimeException("Runtime stack is empty.");
-        }
+        var value = PopAny();
 
         if (value.Type is not StackValueType.Reference)
         {

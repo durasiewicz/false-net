@@ -134,6 +134,12 @@ public class Parser
                         break;
                     }
 
+                    case TokenType.Delete:
+                    {
+                        _evaluationStack.PopAny();
+                        break;
+                    }
+
                     case TokenType.Addition:
                     case TokenType.Substraction:
                     case TokenType.Multiplication:
