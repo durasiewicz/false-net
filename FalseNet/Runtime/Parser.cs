@@ -210,7 +210,6 @@ public class Parser
     {
         var functionCounter = 0;
         var functionsHandleStack = new Stack<int>();
-        var result = new List<Token>();
 
         foreach (var token in tokens)
         {
@@ -240,8 +239,8 @@ public class Parser
                     }
                     else
                     {
-                        result.Add(variableToken);
-                        result.Add(fetchValueToken);
+                        yield return variableToken;
+                        yield return fetchValueToken;
                     }
                     
                     break;
@@ -255,15 +254,13 @@ public class Parser
                     }
                     else
                     {
-                        result.Add(token);
+                        yield return token;
                     }
 
                     break;
                 }
             }
         }
-
-        return result;
     }
 
     private void CallFunction(NumberValue functionId)
