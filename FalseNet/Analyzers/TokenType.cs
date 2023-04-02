@@ -145,5 +145,10 @@ public enum TokenType
     /// <summary>
     /// ø
     /// </summary>
-    Pick
+    Pick,
+    
+    /// <summary>
+    /// §
+    /// </summary>
+    Section
 }

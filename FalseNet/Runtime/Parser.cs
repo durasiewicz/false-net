@@ -25,6 +25,11 @@ public class Parser
             {
                 switch (token.Type)
                 {
+                    case TokenType.Section:
+                        // no op - this is only for debugging purposes
+                        var info = _evaluationStack.PrintDebugInfo();
+                        break;
+                    
                     case TokenType.NumericLiteral:
                         _evaluationStack.PushNumber(int.Parse(token.Value ??
                                                               throw new RuntimeException(
@@ -49,7 +54,7 @@ public class Parser
 
                             var conditionResult = _evaluationStack.PopNumber();
 
-                            if (conditionResult.Value == TrueValue)
+                            if (conditionResult.Value != FalseValue)
                             {
                                 CallFunction(bodyFunctionHandle);
                             }

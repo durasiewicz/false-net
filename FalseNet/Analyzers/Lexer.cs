@@ -227,6 +227,12 @@ public static class Lexer
                         TokenType.Pick);
                     break;
                 
+                case '§':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.Section);
+                    break;
+                
                 case '"':
                     switch (mode)
                     {
