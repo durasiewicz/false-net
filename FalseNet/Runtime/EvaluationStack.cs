@@ -5,26 +5,38 @@ namespace FalseNet.Runtime;
 
 public class EvaluationStack
 {
-    private readonly Stack<StackValue> _stack = new Stack<StackValue>();
-    
+    private readonly Stack<StackValue> _stack = new();
+
     public void PushNumber(int value, bool isFunctionHandle = false)
     {
         _stack.Push(new NumberValue(value, isFunctionHandle));
+    }
+
+    public void PushAny(StackValue value) => _stack.Push(value);
+
+    public StackValue PeekAny(int index)
+    {
+        if (index >= _stack.Count)
+        {
+            throw new RuntimeException($"Index '{index}' is out of evaluation stack range.");
+        }
+
+        return _stack.ElementAt(index);
     }
 
     public StackValue PopAny()
     {
         if (!_stack.TryPop(out var value))
         {
-            throw new RuntimeException("Runtime stack is empty.");
+            throw new RuntimeException("Evaluation stack is empty.");
         }
 
         return value;
     }
-    
+
     public NumberValue PopNumber()
     {
-        var value = PopAny(); 
+        var value = PopAny();
 
         if (value.Type is not StackValueType.Number)
         {
@@ -39,7 +51,7 @@ public class EvaluationStack
     {
         _stack.Push(new ReferenceValue(key));
     }
-    
+
     public ReferenceValue PopReference()
     {
         var value = PopAny();
@@ -67,7 +79,7 @@ public class EvaluationStack
 
             sb.AppendLine(msg);
         }
-        
+
         return sb.ToString();
     }
 }

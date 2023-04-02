@@ -30,12 +30,29 @@ public static class Lexer
         {
             if (commentStack.Any() && input[index] is not '{' and not '}')
             {
+                if (input[index] == '\n')
+                {
+                    currentPosition = 0;
+                    currentLine++;
+                }
+                
+                currentPosition++;
+                
                 continue;
             }
 
             if (mode == Mode.DoubleQuotedStringLiteral && input[index] is not '"')
             {
                 charBuffer.Append(input[index]);
+                
+                if (input[index] == '\n')
+                {
+                    currentPosition = 0;
+                    currentLine++;
+                }
+
+                currentPosition++;
+                
                 continue;
             }
 
@@ -202,6 +219,12 @@ public static class Lexer
                     yield return new Token(currentPosition,
                         currentLine,
                         TokenType.Hash);
+                    break;
+                
+                case 'ø':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.Pick);
                     break;
                 
                 case '"':

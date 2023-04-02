@@ -140,5 +140,10 @@ public enum TokenType
     /// <summary>
     /// ^
     /// </summary>
-    Caret
+    Caret,
+    
+    /// <summary>
+    /// ø
+    /// </summary>
+    Pick
 }

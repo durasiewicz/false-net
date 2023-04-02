@@ -26,7 +26,9 @@ public class Parser
                 switch (token.Type)
                 {
                     case TokenType.NumericLiteral:
-                        _evaluationStack.PushNumber(int.Parse(token.Value));
+                        _evaluationStack.PushNumber(int.Parse(token.Value ??
+                                                              throw new RuntimeException(
+                                                                  $"Value {token.Type} is null.")));
                         break;
 
                     case TokenType.Exclamation:
@@ -147,7 +149,7 @@ public class Parser
 
                         break;
                     }
-                    
+
                     case TokenType.Bar:
                     {
                         var num2 = _evaluationStack.PopNumber();
@@ -156,6 +158,15 @@ public class Parser
                         _evaluationStack.PushNumber(num1.Value == TrueValue || num2.Value == TrueValue
                             ? TrueValue
                             : FalseValue);
+
+                        break;
+                    }
+
+                    case TokenType.Pick:
+                    {
+                        var number = _evaluationStack.PopNumber();
+                        var item = _evaluationStack.PeekAny(number.Value);
+                        _evaluationStack.PushAny(item);
 
                         break;
                     }
@@ -209,6 +220,19 @@ public class Parser
                         break;
                     }
 
+                    case TokenType.At:
+                    {
+                        var num3 = _evaluationStack.PopNumber();
+                        var num2 = _evaluationStack.PopNumber();
+                        var num1 = _evaluationStack.PopNumber();
+
+                        _evaluationStack.PushNumber(num2.Value);
+                        _evaluationStack.PushNumber(num3.Value);
+                        _evaluationStack.PushNumber(num1.Value);
+
+                        break;
+                    }
+
                     case TokenType.Caret:
                     {
                         // if buffer is empty take some input from user
@@ -222,29 +246,16 @@ public class Parser
                         _inputBuffer.Remove(0, 1);
 
                         _evaluationStack.PushNumber(character);
-                        
-                        // var key = Console.ReadKey();
-                        //
-                        // 
-                        //
-                        // if (key.Key == ConsoleKey.Enter)
-                        // {
-                        //     Console.WriteLine();
-                        // }
-                        //
                         break;
                     }
-
-                    case TokenType.OpenBracket:
-                    case TokenType.CloseBracket:
-                        throw new RuntimeException("Unexpected function begin or end. Functions compiler fails?");
 
                     case TokenType.DoubleQuotedStringLiteral:
                         Console.Write(token.Value);
                         break;
 
                     case TokenType.StringLiteral:
-                        _evaluationStack.PushReference(token.Value);
+                        _evaluationStack.PushReference(token.Value ??
+                                                       throw new RuntimeException($"Value {token.Type} is null."));
                         break;
 
                     default:
