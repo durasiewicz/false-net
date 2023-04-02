@@ -135,5 +135,10 @@ public enum TokenType
     /// <summary>
     /// #
     /// </summary>
-    Hash
+    Hash,
+    
+    /// <summary>
+    /// ^
+    /// </summary>
+    Caret
 }

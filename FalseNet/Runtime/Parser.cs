@@ -1,3 +1,4 @@
+using System.Text;
 using FalseNet.Analyzers;
 using FalseNet.Exceptions;
 
@@ -8,6 +9,7 @@ public class Parser
     private readonly EvaluationStack _evaluationStack = new();
     private readonly Dictionary<string, Variable> _variables = new();
     private readonly Dictionary<int, List<Token>> _functions = new();
+    private readonly StringBuilder _inputBuffer = new();
 
     private const string AnonymousFunctionPrefix = "<f>_";
     private const int TrueValue = -1;
@@ -204,6 +206,32 @@ public class Parser
                         _evaluationStack.PushNumber(_variables[reference.Key].Value,
                             _variables[reference.Key].IsFunctionHandle);
 
+                        break;
+                    }
+
+                    case TokenType.Caret:
+                    {
+                        // if buffer is empty take some input from user
+                        while (_inputBuffer.Length == 0)
+                        {
+                            _inputBuffer.Append(Console.ReadLine());
+                            _inputBuffer.Append('\n');
+                        }
+
+                        var character = _inputBuffer[0];
+                        _inputBuffer.Remove(0, 1);
+
+                        _evaluationStack.PushNumber(character);
+                        
+                        // var key = Console.ReadKey();
+                        //
+                        // 
+                        //
+                        // if (key.Key == ConsoleKey.Enter)
+                        // {
+                        //     Console.WriteLine();
+                        // }
+                        //
                         break;
                     }
 

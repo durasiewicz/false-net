@@ -66,6 +66,12 @@ public static class Lexer
                         TokenType.Semicolon);
                     break;
                 
+                case '^':
+                    yield return new Token(currentPosition,
+                        currentLine,
+                        TokenType.Caret);
+                    break;
+                
                 case ':':
                     yield return new Token(currentPosition,
                         currentLine,

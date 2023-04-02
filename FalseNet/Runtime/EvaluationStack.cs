@@ -1,3 +1,4 @@
+using System.Text;
 using FalseNet.Exceptions;
 
 namespace FalseNet.Runtime;
@@ -50,5 +51,23 @@ public class EvaluationStack
         }
 
         return (ReferenceValue)value;
+    }
+
+    public string PrintDebugInfo()
+    {
+        var sb = new StringBuilder();
+
+        foreach (var value in _stack)
+        {
+            var msg = value switch
+            {
+                NumberValue numberValue => $"{numberValue.Type} {numberValue.Value} {(char)numberValue.Value}",
+                ReferenceValue refValue => $"{refValue.Type} {refValue.Key}"
+            };
+
+            sb.AppendLine(msg);
+        }
+        
+        return sb.ToString();
     }
 }

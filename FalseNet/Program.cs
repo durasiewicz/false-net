@@ -3,9 +3,8 @@ using FalseNet.Runtime;
 
 var p = @"
 
-[$1=$[\%1\]?~[$1-f;!*]?]f:
-
-6f;!. 
+""Please enter your name: "" 0[$10=~][^]#%
+""Hello: "" [$0>][,]#
 
 ";
 
