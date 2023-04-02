@@ -21,8 +21,8 @@ public static class Lexer
         }
 
         var commentStack = new Stack<Token>();
-        var currentLine = 0;
-        var currentPosition = 0;
+        var currentLine = 1;
+        var currentPosition = 1;
         var charBuffer = new StringBuilder();
         var mode = Mode.Default;
 
@@ -32,7 +32,7 @@ public static class Lexer
             {
                 if (input[index] == '\n')
                 {
-                    currentPosition = 0;
+                    currentPosition = 1;
                     currentLine++;
                 }
                 
@@ -47,7 +47,7 @@ public static class Lexer
                 
                 if (input[index] == '\n')
                 {
-                    currentPosition = 0;
+                    currentPosition = 1;
                     currentLine++;
                 }
 
@@ -253,7 +253,7 @@ public static class Lexer
                 
                 case '\n':
                     currentLine++;
-                    currentPosition = 0;
+                    currentPosition = 1;
                     break;
 
                 default:
