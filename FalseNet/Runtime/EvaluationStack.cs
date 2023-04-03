@@ -74,7 +74,8 @@ public class EvaluationStack
             var msg = value switch
             {
                 NumberValue numberValue => $"{numberValue.Type} {numberValue.Value} {(char)numberValue.Value}",
-                ReferenceValue refValue => $"{refValue.Type} {refValue.Key}"
+                ReferenceValue refValue => $"{refValue.Type} {refValue.Key}",
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             sb.AppendLine(msg);

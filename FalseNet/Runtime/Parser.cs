@@ -54,7 +54,7 @@ public class Parser
 
                             var conditionResult = _evaluationStack.PopNumber();
 
-                            if (conditionResult.Value != FalseValue)
+                            if (conditionResult.Value == TrueValue)
                             {
                                 CallFunction(bodyFunctionHandle);
                             }
