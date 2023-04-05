@@ -21,13 +21,14 @@ public static class Program
             }
 
             var script = File.ReadAllText(args[0]);
-            var tokens = Lexer.Lex(script);
+            // We need to enumerate all items before parsing to get any lexer exceptions
+            var tokens = Lexer.Lex(script).ToArray();
             var parser = new Parser();
             parser.Parse(tokens);
         }
         catch (LexerException e)
         {
-            WriteLine($"Lexer error: {e.Message}");
+            WriteLine($"Lexer error: {e.Message} @ line '{e.Line}', position '{e.Position}'.");
         }
         catch (RuntimeException e)
         {

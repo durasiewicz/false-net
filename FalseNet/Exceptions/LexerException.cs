@@ -2,12 +2,12 @@ namespace FalseNet.Exceptions;
 
 public class LexerException : Exception
 {
-    public int PosX { get; }
-    public int PosY { get; }
+    public int Position { get; }
+    public int Line { get; }
 
-    public LexerException(int posX, int posY, string message) : base(message)
+    public LexerException(int position, int line, string message) : base(message)
     {
-        PosX = posX;
-        PosY = posY;
+        Position = position;
+        Line = line;
     }
 }

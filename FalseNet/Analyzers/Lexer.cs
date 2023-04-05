@@ -20,7 +20,7 @@ public static class Lexer
             throw new ArgumentOutOfRangeException(nameof(input));
         }
 
-        var commentStack = new Stack<Token>();
+        var pairedTokensStack = new Stack<Token>();
         var currentLine = 1;
         var currentPosition = 1;
         var charBuffer = new StringBuilder();
@@ -28,7 +28,9 @@ public static class Lexer
 
         for (var index = 0; index < input.Length; index++)
         {
-            if (commentStack.Any() && input[index] is not '{' and not '}')
+            if (pairedTokensStack.Any() && 
+                pairedTokensStack.Peek().Type is TokenType.CommentBegin &&
+                input[index] is not '{' and not '}')
             {
                 if (input[index] == '\n')
                 {
@@ -61,17 +63,17 @@ public static class Lexer
                 case '{':
                 {
                     var token = new Token(currentPosition, currentLine, TokenType.CommentBegin);
-                    commentStack.Push(token);
+                    pairedTokensStack.Push(token);
                     break;
                 }
 
                 case '}':
                 {
-                    if (!commentStack.TryPop(out _))
+                    if (!pairedTokensStack.TryPop(out var token) || token.Type is not TokenType.CommentBegin)
                     {
                         throw new LexerException(currentPosition,
                             currentLine,
-                            "Unexpected character '}'.");
+                            "Unexpected character '}'");
                     }
 
                     break;
@@ -237,24 +239,37 @@ public static class Lexer
                     switch (mode)
                     {
                         case Mode.Default:
+                        {
                             mode = Mode.DoubleQuotedStringLiteral;
-                            break;
-                        case Mode.DoubleQuotedStringLiteral:
-                            yield return new Token(currentPosition,
+                            pairedTokensStack.Push(new Token(currentPosition,
                                 currentLine,
-                                TokenType.DoubleQuotedStringLiteral,
-                                charBuffer.ToString());
+                                TokenType.DoubleQuotedStringLiteral));
+                            break;
+                        }
+                        case Mode.DoubleQuotedStringLiteral:
+                        {
+                            if (!pairedTokensStack.TryPop(out var token) ||
+                                token.Type is not TokenType.DoubleQuotedStringLiteral)
+                            {
+                                throw new LexerException(currentPosition,
+                                    currentLine,
+                                    "Unexpected character '\"'");
+                            }
 
+                            yield return token with { Value = charBuffer.ToString() };
                             charBuffer.Clear();
                             mode = Mode.Default;
                             break;
+                        }
                     }
                     break;
                 
                 case '\n':
+                {
                     currentLine++;
                     currentPosition = 1;
                     break;
+                }
 
                 default:
                 {
@@ -308,13 +323,17 @@ public static class Lexer
             currentPosition++;
         }
 
-        // Unclosed comment
-        if (commentStack.Any())
+        // Unclosed tokens
+        if (pairedTokensStack.Any())
         {
-            var firstComment = commentStack.First();
-            throw new LexerException(firstComment.Position,
-                firstComment.Line,
-                "Unclosed comment.");
+            var unclosedToken = pairedTokensStack.Pop();
+
+            throw new LexerException(unclosedToken.Position, unclosedToken.Line, unclosedToken.Type switch
+            {
+                TokenType.CommentBegin => "Unclosed comment",
+                TokenType.DoubleQuotedStringLiteral => "Unclosed double-quoted string literal",
+                var type => $"Unclosed token of type '{type}'"
+            });
         }
     }
 }
