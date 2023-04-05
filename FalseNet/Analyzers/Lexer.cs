@@ -273,46 +273,54 @@ public static class Lexer
 
                 default:
                 {
-                    switch (mode)
+                    if (mode is Mode.Default)
                     {
-                        case Mode.Default:
-                            if (char.IsDigit(input[index]))
-                                mode = Mode.NumericLiteral;
-
-                            if (char.IsLetter(input[index]))
-                                mode = Mode.StringLiteral;
-                            break;
-                    }
-
-                    if (mode == Mode.NumericLiteral)
-                    {
-                        charBuffer.Append(input[index]);
-                        
-                        if (index + 1 >= input.Length || !char.IsNumber(input[index + 1]))
+                        if (char.IsDigit(input[index]))
                         {
-                            yield return new Token(currentPosition,
-                                currentLine,
-                                TokenType.NumericLiteral,
-                                charBuffer.ToString());
-                            
-                            charBuffer.Clear();
-                            mode = Mode.Default;
+                            mode = Mode.NumericLiteral;
+                        } 
+                        else if (char.IsLetter(input[index]))
+                        {
+                            mode = Mode.StringLiteral;
                         }
                     }
-                    
-                    if (mode == Mode.StringLiteral)
+
+                    switch (mode)
                     {
-                        charBuffer.Append(input[index]);
-                        
-                        if (index + 1 < input.Length || !char.IsLetter(input[index + 1]))
+                        case Mode.NumericLiteral:
                         {
-                            yield return new Token(currentPosition,
-                                currentLine,
-                                TokenType.StringLiteral,
-                                charBuffer.ToString());
+                            charBuffer.Append(input[index]);
+                        
+                            if (index + 1 >= input.Length || !char.IsNumber(input[index + 1]))
+                            {
+                                yield return new Token(currentPosition,
+                                    currentLine,
+                                    TokenType.NumericLiteral,
+                                    charBuffer.ToString());
                             
-                            charBuffer.Clear();
-                            mode = Mode.Default;
+                                charBuffer.Clear();
+                                mode = Mode.Default;
+                            }
+
+                            break;
+                        }
+                        
+                        case Mode.StringLiteral:
+                        {
+                            charBuffer.Append(input[index]);
+                        
+                            if (index + 1 < input.Length || !char.IsLetter(input[index + 1]))
+                            {
+                                yield return new Token(currentPosition,
+                                    currentLine,
+                                    TokenType.StringLiteral,
+                                    charBuffer.ToString());
+                            
+                                charBuffer.Clear();
+                                mode = Mode.Default;
+                            }
+
+                            break;
                         }
                     }
 
