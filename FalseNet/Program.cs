@@ -19,7 +19,7 @@ public static class Program
                               nameof(FalseNet)} <script>.f");
                 return;
             }
-
+            
             var script = File.ReadAllText(args[0]);
             // We need to enumerate all items before parsing to get any lexer exceptions
             var tokens = Lexer.Lex(script).ToArray();
@@ -28,7 +28,7 @@ public static class Program
         }
         catch (LexerException e)
         {
-            WriteLine($"Lexer error: {e.Message} @ line '{e.Line}', position '{e.Position}'.");
+            WriteLine($"Lexer error: {e.Message} @ line '{e.Line}', position '{e.Column}'.");
         }
         catch (RuntimeException e)
         {

@@ -1,3 +1,5 @@
+using FalseNet.Compiler;
+
 namespace FalseNet.Analyzers;
 
 public record Token(int Position,

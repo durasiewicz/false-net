@@ -1,4 +1,5 @@
 using System.Text;
+using FalseNet.Compiler;
 using FalseNet.Exceptions;
 
 namespace FalseNet.Analyzers;
@@ -71,9 +72,8 @@ public static class Lexer
                 {
                     if (!pairedTokensStack.TryPop(out var token) || token.Type is not TokenType.CommentBegin)
                     {
-                        throw new LexerException(currentPosition,
-                            currentLine,
-                            "Unexpected character '}'");
+                        throw new LexerException(currentLine,
+                            currentPosition, "Unexpected character '}'");
                     }
 
                     break;
@@ -208,13 +208,13 @@ public static class Lexer
                 case '[':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.OpenBracket);
+                        TokenType.OpenSquareBracket);
                     break;
                 
                 case ']':
                     yield return new Token(currentPosition,
                         currentLine,
-                        TokenType.CloseBracket);
+                        TokenType.CloseSquareBracket);
                     break;
                 
                 case '#':
@@ -251,9 +251,8 @@ public static class Lexer
                             if (!pairedTokensStack.TryPop(out var token) ||
                                 token.Type is not TokenType.DoubleQuotedStringLiteral)
                             {
-                                throw new LexerException(currentPosition,
-                                    currentLine,
-                                    "Unexpected character '\"'");
+                                throw new LexerException(currentLine,
+                                    currentPosition, "Unexpected character '\"'");
                             }
 
                             yield return token with { Value = charBuffer.ToString() };
@@ -336,7 +335,7 @@ public static class Lexer
         {
             var unclosedToken = pairedTokensStack.Pop();
 
-            throw new LexerException(unclosedToken.Position, unclosedToken.Line, unclosedToken.Type switch
+            throw new LexerException(unclosedToken.Line, unclosedToken.Position, unclosedToken.Type switch
             {
                 TokenType.CommentBegin => "Unclosed comment",
                 TokenType.DoubleQuotedStringLiteral => "Unclosed double-quoted string literal",

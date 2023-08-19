@@ -1,4 +1,4 @@
-namespace FalseNet.Analyzers;
+namespace FalseNet.Compiler;
 
 public enum TokenType
 {
@@ -10,13 +10,18 @@ public enum TokenType
     /// <summary>
     /// [
     /// </summary>
-    OpenBracket,
-
+    OpenSquareBracket,
+    
     /// <summary>
     /// ]
     /// </summary>
-    CloseBracket,
+    CloseSquareBracket,
 
+    /// <summary>
+    /// "
+    /// </summary>
+    DoubleQuote,
+    
     /// <summary>
     /// abc
     /// </summary>

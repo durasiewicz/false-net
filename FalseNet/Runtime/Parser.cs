@@ -1,6 +1,8 @@
 using System.Text;
 using FalseNet.Analyzers;
+using FalseNet.Compiler;
 using FalseNet.Exceptions;
+using Token = FalseNet.Analyzers.Token;
 
 namespace FalseNet.Runtime;
 
@@ -283,7 +285,7 @@ public class Parser
         {
             switch (token.Type)
             {
-                case TokenType.OpenBracket:
+                case TokenType.OpenSquareBracket:
                 {
                     var functionHandle = functionCounter++;
                     functionsHandleStack.Push(functionHandle);
@@ -291,7 +293,7 @@ public class Parser
                     break;
                 }
 
-                case TokenType.CloseBracket:
+                case TokenType.CloseSquareBracket:
                 {
                     var functionHandle = functionsHandleStack.Pop();
                     var variableName = AnonymousFunctionPrefix + functionHandle;
