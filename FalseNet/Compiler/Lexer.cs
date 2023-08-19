@@ -39,11 +39,11 @@ internal static class Lexer
                 case var c when char.IsDigit(c):
                     yield return ScanNumber(buffer);
                     break;
-                
+
                 case '"':
-                    yield return new Token(TokenType.DoubleQuote, buffer.Position);
+                    yield return ScanLiteral(buffer);
                     break;
-                
+
                 case ';':
                     yield return new Token(TokenType.Semicolon, buffer.Position);
                     break;
@@ -151,6 +151,19 @@ internal static class Lexer
         }
     }
 
+    private static Token ScanLiteral(TextBuffer buffer)
+    {
+        var (startPosition, endPosition) = (Cursor: buffer.Position, buffer.Position + 1);
+
+        while (buffer.PeekNext(out var nextChar) && nextChar is not '"')
+        {
+            endPosition++;
+            buffer.MoveNext();
+        }
+
+        return new Token(TokenType.Literal, startPosition, endPosition - startPosition);
+    }
+    
     private static Token ScanNumber(TextBuffer buffer)
     {
         var (startPosition, endPosition) = (Cursor: buffer.Position, buffer.Position + 1);
@@ -161,7 +174,7 @@ internal static class Lexer
             buffer.MoveNext();
         }
 
-        return new Token(TokenType.NumericLiteral, startPosition, endPosition - startPosition);
+        return new Token(TokenType.Number, startPosition, endPosition - startPosition);
     }
 
     private static Token ScanIdentifier(TextBuffer buffer)
@@ -174,6 +187,6 @@ internal static class Lexer
             buffer.MoveNext();
         }
 
-        return new Token(TokenType.StringLiteral, startPosition, endPosition - startPosition);
+        return new Token(TokenType.Identifier, startPosition, endPosition - startPosition);
     }
 }

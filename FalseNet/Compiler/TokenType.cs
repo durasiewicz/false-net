@@ -16,21 +16,21 @@ public enum TokenType
     /// ]
     /// </summary>
     CloseSquareBracket,
-
-    /// <summary>
-    /// "
-    /// </summary>
-    DoubleQuote,
-    
+        
     /// <summary>
     /// abc
     /// </summary>
-    StringLiteral,
+    Identifier,
 
     /// <summary>
     /// 123
     /// </summary>
-    NumericLiteral,
+    Number,
+    
+    /// <summary>
+    /// All characters between double-quotes.
+    /// </summary>
+    Literal,
 
     /// <summary>
     /// :

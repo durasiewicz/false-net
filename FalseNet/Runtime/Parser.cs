@@ -32,7 +32,7 @@ public class Parser
                         var info = _evaluationStack.PrintDebugInfo();
                         break;
                     
-                    case TokenType.NumericLiteral:
+                    case TokenType.Number:
                         _evaluationStack.PushNumber(int.Parse(token.Value ??
                                                               throw new RuntimeException(
                                                                   $"Value {token.Type} is null.")));
@@ -260,7 +260,7 @@ public class Parser
                         Console.Write(token.Value);
                         break;
 
-                    case TokenType.StringLiteral:
+                    case TokenType.Identifier:
                         _evaluationStack.PushReference(token.Value ??
                                                        throw new RuntimeException($"Value {token.Type} is null."));
                         break;
@@ -297,7 +297,7 @@ public class Parser
                 {
                     var functionHandle = functionsHandleStack.Pop();
                     var variableName = AnonymousFunctionPrefix + functionHandle;
-                    var variableToken = token with { Type = TokenType.StringLiteral, Value = variableName };
+                    var variableToken = token with { Type = TokenType.Identifier, Value = variableName };
                     var fetchValueToken = token with { Type = TokenType.Semicolon, Value = null };
 
                     _variables.Add(variableName, new Variable(functionHandle, true));

@@ -294,7 +294,7 @@ public static class Lexer
                             {
                                 yield return new Token(currentPosition,
                                     currentLine,
-                                    TokenType.NumericLiteral,
+                                    TokenType.Number,
                                     charBuffer.ToString());
                             
                                 charBuffer.Clear();
@@ -312,7 +312,7 @@ public static class Lexer
                             {
                                 yield return new Token(currentPosition,
                                     currentLine,
-                                    TokenType.StringLiteral,
+                                    TokenType.Identifier,
                                     charBuffer.ToString());
                             
                                 charBuffer.Clear();
