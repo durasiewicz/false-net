@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using static System.Console;
-using FalseNet.Analyzers;
 using FalseNet.Exceptions;
+using FalseNet.Lexing;
 using FalseNet.Runtime;
 
 namespace FalseNet;
@@ -19,12 +19,12 @@ public static class Program
                               nameof(FalseNet)} <script>.f");
                 return;
             }
-            
-            var script = File.ReadAllText(args[0]);
+
+            var code = File.ReadAllText(args[0]);
             // We need to enumerate all items before parsing to get any lexer exceptions
-            var tokens = Lexer.Lex(script).ToArray();
+            var tokens = Lexer.Lex(code).ToArray();
             var parser = new Parser();
-            parser.Parse(tokens);
+            parser.Parse(code, tokens);
         }
         catch (LexerException e)
         {

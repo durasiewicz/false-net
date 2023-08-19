@@ -9,4 +9,8 @@
 
 
 
+    <ItemGroup>
+      <Folder Include="Analyzers\" />
+    </ItemGroup>
+
 </Project>

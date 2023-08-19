@@ -18,7 +18,7 @@ public class EvaluationStack
     {
         if (index >= _stack.Count)
         {
-            throw new RuntimeException($"Index '{index}' is out of evaluation stack range.");
+            throw new RuntimeException($"Index '{index}' is out of evaluation stack range");
         }
 
         return _stack.ElementAt(index);
@@ -28,7 +28,7 @@ public class EvaluationStack
     {
         if (!_stack.TryPop(out var value))
         {
-            throw new RuntimeException("Evaluation stack is empty.");
+            throw new RuntimeException("Evaluation stack is empty");
         }
 
         return value;
@@ -41,7 +41,7 @@ public class EvaluationStack
         if (value.Type is not StackValueType.Number)
         {
             throw new RuntimeException(
-                $"Expected '{nameof(StackValueType.Number)}' on stack. Got '{value.Type.ToString()}'.");
+                $"Expected '{nameof(StackValueType.Number)}' on stack, got '{value.Type.ToString()}'");
         }
 
         return (NumberValue)value;
@@ -59,7 +59,7 @@ public class EvaluationStack
         if (value.Type is not StackValueType.Reference)
         {
             throw new RuntimeException(
-                $"Expected '{nameof(StackValueType.Reference)}' on stack. Got '{value.Type.ToString()}'.");
+                $"Expected '{nameof(StackValueType.Reference)}' on stack, got '{value.Type.ToString()}'");
         }
 
         return (ReferenceValue)value;

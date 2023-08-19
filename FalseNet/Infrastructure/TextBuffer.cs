@@ -13,8 +13,8 @@ internal sealed class TextBuffer
     private readonly int _inputLenght;
     
     public int Position { get; private set; } = -1;
-    public int Line { get; private set; } = 0;
-    public int Column { get; private set; } = 0;
+    public int Line { get; private set; }
+    public int Column { get; private set; }
     
     public bool MoveNext()
     {

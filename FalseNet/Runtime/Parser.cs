@@ -1,12 +1,10 @@
 using System.Text;
-using FalseNet.Analyzers;
-using FalseNet.Compiler;
 using FalseNet.Exceptions;
-using Token = FalseNet.Analyzers.Token;
+using FalseNet.Lexing;
 
 namespace FalseNet.Runtime;
 
-public class Parser
+internal class Parser
 {
     private readonly EvaluationStack _evaluationStack = new();
     private readonly Dictionary<string, Variable> _variables = new();
@@ -17,8 +15,9 @@ public class Parser
     private const int TrueValue = -1;
     private const int FalseValue = 0;
 
-    public void Parse(IEnumerable<Token> tokens)
+    public void Parse(string code, IEnumerable<Token> tokens)
     {
+        var codeSpan = code.AsSpan();
         tokens = CompileFunctions(tokens);
 
         foreach (var token in tokens)
@@ -33,15 +32,13 @@ public class Parser
                         break;
                     
                     case TokenType.Number:
-                        _evaluationStack.PushNumber(int.Parse(token.Value ??
-                                                              throw new RuntimeException(
-                                                                  $"Value {token.Type} is null.")));
+                        _evaluationStack.PushNumber(int.Parse(codeSpan.Slice(token.Start, token.Lenght)));
                         break;
 
                     case TokenType.Exclamation:
                     {
                         var functionHandle = _evaluationStack.PopNumber();
-                        CallFunction(functionHandle);
+                        CallFunction(code, functionHandle);
                         break;
                     }
 
@@ -52,13 +49,13 @@ public class Parser
 
                         while (true)
                         {
-                            CallFunction(conditionFunctionHandle);
+                            CallFunction(code, conditionFunctionHandle);
 
                             var conditionResult = _evaluationStack.PopNumber();
 
                             if (conditionResult.Value == TrueValue)
                             {
-                                CallFunction(bodyFunctionHandle);
+                                CallFunction(code, bodyFunctionHandle);
                             }
                             else
                             {
@@ -139,7 +136,7 @@ public class Parser
 
                         if (condition.Value == TrueValue)
                         {
-                            CallFunction(functionId);
+                            CallFunction(code, functionId);
                         }
 
                         break;
@@ -256,13 +253,12 @@ public class Parser
                         break;
                     }
 
-                    case TokenType.DoubleQuotedStringLiteral:
-                        Console.Write(token.Value);
+                    case TokenType.Literal:
+                        Console.Out.Write(codeSpan.Slice(token.Start, token.Lenght));
                         break;
 
                     case TokenType.Identifier:
-                        _evaluationStack.PushReference(token.Value ??
-                                                       throw new RuntimeException($"Value {token.Type} is null."));
+                        _evaluationStack.PushReference(token.Value ?? codeSpan.Slice(token.Start, token.Lenght).ToString());
                         break;
 
                     default:
@@ -271,7 +267,7 @@ public class Parser
             }
             catch (RuntimeException e)
             {
-                throw new RuntimeException($"{e.Message} @ line: {token.Line} position: {token.Position}");
+                throw new RuntimeException($"{e.Message} @ line: {token.Line} column: {token.Column}");
             }
         }
     }
@@ -298,11 +294,11 @@ public class Parser
                     var functionHandle = functionsHandleStack.Pop();
                     var variableName = AnonymousFunctionPrefix + functionHandle;
                     var variableToken = token with { Type = TokenType.Identifier, Value = variableName };
-                    var fetchValueToken = token with { Type = TokenType.Semicolon, Value = null };
+                    var fetchValueToken = token with { Type = TokenType.Semicolon };
 
                     _variables.Add(variableName, new Variable(functionHandle, true));
 
-                    if (functionsHandleStack.Any())
+                    if (functionsHandleStack.Count != 0)
                     {
                         _functions[functionsHandleStack.Peek()].Add(variableToken);
                         _functions[functionsHandleStack.Peek()].Add(fetchValueToken);
@@ -333,7 +329,7 @@ public class Parser
         }
     }
 
-    private void CallFunction(NumberValue functionId)
+    private void CallFunction(string code, NumberValue functionId)
     {
         if (!functionId.IsFunctionHandle)
         {
@@ -345,6 +341,6 @@ public class Parser
             throw new RuntimeException("Function is undefined.");
         }
 
-        Parse(function);
+        Parse(code, function);
     }
 }

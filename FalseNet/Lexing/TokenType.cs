@@ -1,12 +1,7 @@
-namespace FalseNet.Compiler;
+namespace FalseNet.Lexing;
 
 public enum TokenType
 {
-    /// <summary>
-    /// { (internal lexer use)
-    /// </summary>
-    CommentBegin,
-
     /// <summary>
     /// [
     /// </summary>
@@ -116,12 +111,7 @@ public enum TokenType
     /// ~
     /// </summary>
     Tilde,
-
-    /// <summary>
-    /// "abc"
-    /// </summary>
-    DoubleQuotedStringLiteral,
-
+        
     /// <summary>
     /// .
     /// </summary>
