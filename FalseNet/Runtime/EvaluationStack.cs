@@ -9,7 +9,7 @@ public class EvaluationStack
 
     public void PushNumber(int value, bool isFunctionHandle = false)
     {
-        _stack.Push(new NumberValue(value, isFunctionHandle));
+        _stack.Push(new NumberStackValue(value, isFunctionHandle));
     }
 
     public void PushAny(StackValue value) => _stack.Push(value);
@@ -34,35 +34,35 @@ public class EvaluationStack
         return value;
     }
 
-    public NumberValue PopNumber()
+    public NumberStackValue PopNumber()
     {
         var value = PopAny();
 
-        if (value.Type is not StackValueType.Number)
+        if (value is NumberStackValue numberStackValue)
         {
-            throw new RuntimeException(
-                $"Expected '{nameof(StackValueType.Number)}' on stack, got '{value.Type.ToString()}'");
+            return numberStackValue;
         }
 
-        return (NumberValue)value;
+        throw new RuntimeException(
+            $"Expected '{nameof(NumberStackValue)}' on stack, got '{value.GetType()}'");
     }
 
     public void PushReference(string key)
     {
-        _stack.Push(new ReferenceValue(key));
+        _stack.Push(new ReferenceStackValue(key));
     }
 
-    public ReferenceValue PopReference()
+    public ReferenceStackValue PopReference()
     {
         var value = PopAny();
 
-        if (value.Type is not StackValueType.Reference)
+        if (value is ReferenceStackValue referenceStackValue)
         {
-            throw new RuntimeException(
-                $"Expected '{nameof(StackValueType.Reference)}' on stack, got '{value.Type.ToString()}'");
+            return referenceStackValue;
         }
 
-        return (ReferenceValue)value;
+        throw new RuntimeException(
+            $"Expected '{nameof(ReferenceStackValue)}' on stack, got '{value.GetType()}'");
     }
 
     public string PrintDebugInfo()
@@ -73,8 +73,8 @@ public class EvaluationStack
         {
             var msg = value switch
             {
-                NumberValue numberValue => $"{numberValue.Type} {numberValue.Value} {(char)numberValue.Value}",
-                ReferenceValue refValue => $"{refValue.Type} {refValue.Key}",
+                NumberStackValue numberValue => $"{numberValue.GetType()} {numberValue.Value} {(char)numberValue.Value}",
+                ReferenceStackValue refValue => $"{refValue.GetType()} {refValue.Key}",
                 _ => throw new ArgumentOutOfRangeException()
             };
 

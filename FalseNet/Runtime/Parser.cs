@@ -329,7 +329,7 @@ internal class Parser
         }
     }
 
-    private void CallFunction(string code, NumberValue functionId)
+    private void CallFunction(string code, NumberStackValue functionId)
     {
         if (!functionId.IsFunctionHandle)
         {

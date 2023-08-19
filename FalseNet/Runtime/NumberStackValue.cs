@@ -1,11 +1,11 @@
 namespace FalseNet.Runtime;
 
-public class NumberValue : StackValue
+public class NumberStackValue : StackValue
 {
     public int Value { get; }
     public bool IsFunctionHandle { get; }
 
-    public NumberValue(int value, bool isFunctionHandle) : base(StackValueType.Number)
+    public NumberStackValue(int value, bool isFunctionHandle)
     {
         Value = value;
         IsFunctionHandle = isFunctionHandle;
